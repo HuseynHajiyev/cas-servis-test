@@ -18,3 +18,5 @@ logging:
   level:
     org.springframework.web: DEBUG
     com.cas.casdemo: DEBUG
+server:
+  port: ${PORT:8080}
