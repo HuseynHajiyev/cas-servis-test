@@ -1,10 +1,12 @@
 package com.cas.casdemo.casservis.service;
 
 import com.cas.casdemo.casservis.dto.customer.CustomerPostRequestDTO;
+import com.cas.casdemo.casservis.dto.customer.CustomerUpdateRequestDTO;
 import com.cas.casdemo.casservis.dto.customer.DetailsDTO;
 import com.cas.casdemo.casservis.entity.Customer;
 import com.cas.casdemo.casservis.entity.Details;
 import com.cas.casdemo.casservis.repository.CustomerRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -19,6 +21,40 @@ public class CustomerService {
         Customer entity = mapToEntity(customerDTO);
         return customerRepository.save(entity);
     }
+
+    public Customer update(Long customerId, CustomerUpdateRequestDTO dto) {
+        Customer existing = customerRepository.findById(customerId)
+                .orElseThrow(() -> new EntityNotFoundException("Customer not found"));
+
+        // Only update fields if provided
+        if (dto.getPin() != null) {
+            existing.setPin(dto.getPin());
+        }
+        if (dto.getIsResident() != null) {
+            existing.setIsResident(dto.getIsResident());
+        }
+
+        if (dto.getDetails() != null) {
+            Details details = existing.getDetails() != null
+                    ? existing.getDetails()
+                    : new Details();
+
+            if (dto.getDetails().getName() != null) {
+                details.setName(dto.getDetails().getName());
+            }
+            if (dto.getDetails().getSurname() != null) {
+                details.setSurname(dto.getDetails().getSurname());
+            }
+            if (dto.getDetails().getPhoneNumber() != null) {
+                details.setPhoneNumber(dto.getDetails().getPhoneNumber());
+            }
+
+            existing.setDetails(details);
+        }
+
+        return customerRepository.save(existing);
+    }
+
 
     private void validateCustomer(CustomerPostRequestDTO customer) {
         if (customer.getPin() == null || customer.getPin().trim().isEmpty()) {

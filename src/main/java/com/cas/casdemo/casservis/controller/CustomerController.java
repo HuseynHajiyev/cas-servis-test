@@ -1,6 +1,7 @@
 package com.cas.casdemo.casservis.controller;
 
 import com.cas.casdemo.casservis.dto.customer.CustomerPostRequestDTO;
+import com.cas.casdemo.casservis.dto.customer.CustomerUpdateRequestDTO;
 import com.cas.casdemo.casservis.entity.Customer;
 import com.cas.casdemo.casservis.repository.CustomerRepository;
 import com.cas.casdemo.casservis.service.CustomerService;
@@ -37,5 +38,11 @@ public class CustomerController {
     public ResponseEntity<Customer> getCustomer(@PathVariable Long id) {
         Optional<Customer> customer = customerRepository.findById(id);
         return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody CustomerUpdateRequestDTO dto) {
+        Customer updated = customerService.update(id, dto);
+        return ResponseEntity.ok(updated);
     }
 }
