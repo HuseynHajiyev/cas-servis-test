@@ -1,5 +1,6 @@
 package com.cas.casdemo.casservis.service;
 
+import com.cas.casdemo.casservis.dto.customer.CustomerDeleteResponseDTO;
 import com.cas.casdemo.casservis.dto.customer.CustomerPostRequestDTO;
 import com.cas.casdemo.casservis.dto.customer.CustomerUpdateRequestDTO;
 import com.cas.casdemo.casservis.dto.customer.DetailsDTO;
@@ -20,6 +21,17 @@ public class CustomerService {
         validateCustomer(customerDTO);
         Customer entity = mapToEntity(customerDTO);
         return customerRepository.save(entity);
+    }
+
+    public Customer findById(Long id) throws EntityNotFoundException {
+        return customerRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+
+    public Customer deleteById(Long id) throws EntityNotFoundException {
+        Customer entity = findById(id);
+        customerRepository.delete(entity);
+        return entity;
     }
 
     public Customer update(Long customerId, CustomerUpdateRequestDTO dto) {
@@ -85,5 +97,17 @@ public class CustomerService {
         d.setPhoneNumber(customer.getDetails().getPhoneNumber().trim());
         c.setDetails(d);
         return c;
+    }
+
+    public CustomerDeleteResponseDTO mapFromEntity(Customer customer) {
+        CustomerDeleteResponseDTO cd = new CustomerDeleteResponseDTO();
+        cd.setPin(customer.getPin());
+        cd.setIsResident(customer.getIsResident());
+        DetailsDTO d = new DetailsDTO();
+        d.setName(customer.getDetails().getName());
+        d.setSurname(customer.getDetails().getSurname());
+        d.setPhoneNumber(customer.getDetails().getPhoneNumber());
+        cd.setDetails(d);
+        return cd;
     }
 }

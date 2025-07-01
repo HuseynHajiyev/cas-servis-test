@@ -3,14 +3,13 @@ version: "3.8"
 services:
   cas_servis_db:
     image: postgres:16.8
-    container_name: postgres_container
     restart: always
     env_file:
       - .env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_DB: cas_servis_db
+      POSTGRES_USER: huseyn
+      POSTGRES_PASSWORD: secret
     ports:
       - "5432:5432"
     volumes:
@@ -26,10 +25,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://cas_servis_db:5432/${POSTGRES_DB}
-      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://cas_servis_db:5432/cas_servis_db"
+      SPRING_DATASOURCE_USERNAME: "huseyn"
+      SPRING_DATASOURCE_PASSWORD: "secret"
+      SPRING_JPA_HIBERNATE_DDL_AUTO: "update"
+      SPRING_PROFILES_ACTIVE: "docker"
 volumes:
   postgres_data:

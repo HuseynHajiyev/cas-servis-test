@@ -1,10 +1,13 @@
 package com.cas.casdemo.casservis.controller;
 
+import com.cas.casdemo.casservis.dto.customer.CustomerDeleteResponseDTO;
 import com.cas.casdemo.casservis.dto.customer.CustomerPostRequestDTO;
 import com.cas.casdemo.casservis.dto.customer.CustomerUpdateRequestDTO;
 import com.cas.casdemo.casservis.entity.Customer;
 import com.cas.casdemo.casservis.repository.CustomerRepository;
 import com.cas.casdemo.casservis.service.CustomerService;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,5 +47,17 @@ public class CustomerController {
     public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody CustomerUpdateRequestDTO dto) {
         Customer updated = customerService.update(id, dto);
         return ResponseEntity.ok(updated);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
+        Optional<Customer> customer = customerRepository.findById(id);
+        if (customer.isPresent()) {
+            customerRepository.delete(customer.get());
+            CustomerDeleteResponseDTO cdr = customerService.mapFromEntity(customer.get());
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
