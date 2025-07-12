@@ -1,13 +1,16 @@
+# Stage 1: Build
 FROM gradle:8.7.0-jdk21 AS builder
 WORKDIR /app
-COPY --chown=gradle:gradle . .
+COPY --chown=gradle:gradle build.gradle settings.gradle ./
+RUN gradle clean build -x test --no-daemon || true
+COPY --chown=gradle:gradle src ./src
 RUN gradle clean build -x test --no-daemon
 
-# Stage 2: Run with JDK only
+# Stage 2: Run
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
 COPY --from=builder /app/build/libs/casServis-0.0.1-SNAPSHOT.jar app.jar
+
 EXPOSE 8080
 ENV SPRING_PROFILES_ACTIVE=docker
 ENTRYPOINT ["java", "-jar", "app.jar"]
-

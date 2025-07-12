@@ -1,4 +1,4 @@
-package com.cas.casdemo.casservis.entity;
+package com.cas.casdemo.casservis.entity.customer;
 
 
 import jakarta.persistence.Entity;
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Data
-public class Details {
+public class CustomerDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;

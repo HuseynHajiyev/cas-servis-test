@@ -1,63 +1,64 @@
 package com.cas.casdemo.casservis.controller;
 
-import com.cas.casdemo.casservis.dto.customer.CustomerDeleteResponseDTO;
+import com.cas.casdemo.casservis.dto.customer.CustomerGetResponseDTO;
 import com.cas.casdemo.casservis.dto.customer.CustomerPostRequestDTO;
-import com.cas.casdemo.casservis.dto.customer.CustomerUpdateRequestDTO;
-import com.cas.casdemo.casservis.entity.Customer;
-import com.cas.casdemo.casservis.repository.CustomerRepository;
-import com.cas.casdemo.casservis.service.CustomerService;
-import jakarta.persistence.EntityNotFoundException;
-import org.springframework.http.HttpStatus;
+import com.cas.casdemo.casservis.dto.customer.CustomerPutRequestDTO;
+import com.cas.casdemo.casservis.service.customer.CustomerService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/customers")
+@Validated
 public class CustomerController {
-    private final CustomerRepository customerRepository;
+
     private final CustomerService customerService;
 
-    public CustomerController(CustomerRepository customerRepository, CustomerService customerService) {
-        this.customerRepository = customerRepository;
+    public CustomerController(CustomerService customerService) {
         this.customerService = customerService;
     }
 
-    @PostMapping
-    public ResponseEntity<Customer> save(@RequestBody CustomerPostRequestDTO customer) {
-        Customer savedCustomer = customerService.save(customer);
-        return ResponseEntity.ok(customerRepository.save(savedCustomer));
+    @PostMapping(path = { "", "/" })
+    public ResponseEntity<Long> create(@Valid @RequestBody CustomerPostRequestDTO dto) {
+        Long id = customerService.save(dto);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(id)
+                .toUri();
+
+        return ResponseEntity.created(location).body(id);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Customer>> getAllCustomers() {
-        List<Customer> customers = customerRepository.findAll();
-        return ResponseEntity.ok(customers);
+    @GetMapping(path = { "", "/" })
+    public ResponseEntity<List<CustomerGetResponseDTO>> list() {
+        List<CustomerGetResponseDTO> all = customerService.findAll();
+        return ResponseEntity.ok(all);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Customer> getCustomer(@PathVariable Long id) {
-        Optional<Customer> customer = customerRepository.findById(id);
-        return customer.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    public ResponseEntity<CustomerGetResponseDTO> getOne(@PathVariable Long id) {
+            CustomerGetResponseDTO dto = customerService.findById(id);
+            return ResponseEntity.ok(dto);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Customer> updateCustomer(@PathVariable Long id, @RequestBody CustomerUpdateRequestDTO dto) {
-        Customer updated = customerService.update(id, dto);
-        return ResponseEntity.ok(updated);
+    public ResponseEntity<CustomerGetResponseDTO> update(
+            @PathVariable Long id,
+            @Valid @RequestBody CustomerPutRequestDTO dto) {
+            CustomerGetResponseDTO updatedEntity = customerService.update(id, dto);
+            return ResponseEntity.ok(updatedEntity);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCustomer(@PathVariable Long id) {
-        Optional<Customer> customer = customerRepository.findById(id);
-        if (customer.isPresent()) {
-            customerRepository.delete(customer.get());
-            CustomerDeleteResponseDTO cdr = customerService.mapFromEntity(customer.get());
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        customerService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

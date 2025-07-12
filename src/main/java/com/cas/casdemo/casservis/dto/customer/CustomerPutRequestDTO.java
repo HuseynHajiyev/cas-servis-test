@@ -1,27 +1,22 @@
 package com.cas.casdemo.casservis.dto.customer;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.AssertTrue;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
 @AllArgsConstructor
-public class CustomerPostRequestDTO {
-
-    @NotBlank
-    @Size(min = 7, max = 7)
+@NoArgsConstructor
+public class CustomerPutRequestDTO {
+    @Size(min=7, max=7, message="invalid pin length")
     private String pin;
 
-    @NotNull(message = "resident flag must be provided")
+    @AssertTrue(message="isResident must be true")
     private Boolean resident;
 
-    @NotNull(message = "details must be provided")
     @JsonProperty("details")
-    @Valid
     private CustomerDetailsDTO customerDetails;
 }
-
