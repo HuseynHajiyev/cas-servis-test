@@ -12,10 +12,6 @@ import lombok.NoArgsConstructor;
 public class AccountDTO {
     @NotNull(message = "IBAN must be provided")
     @NotBlank(message = "IBAN must not be blank")
-    @Pattern(
-            regexp  = "^[A-Z]{2}\\d{2}[A-Z0-9]{1,30}$",
-            message = "must be a valid IBAN"
-    )
     private String iban;
 }
 

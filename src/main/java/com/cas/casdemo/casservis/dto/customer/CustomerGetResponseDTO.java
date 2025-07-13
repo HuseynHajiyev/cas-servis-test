@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CustomerGetResponseDTO {
+    private Long id;
     private String pin;
     private Boolean resident;
 

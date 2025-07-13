@@ -5,6 +5,7 @@ import com.cas.casdemo.casservis.dto.customer.CustomerPostRequestDTO;
 import com.cas.casdemo.casservis.dto.customer.CustomerPutRequestDTO;
 import com.cas.casdemo.casservis.dto.customer.CustomerDetailsDTO;
 import com.cas.casdemo.casservis.entity.customer.Customer;
+import com.cas.casdemo.casservis.exception.BadRequestException;
 import com.cas.casdemo.casservis.repository.CustomerRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.modelmapper.ModelMapper;
@@ -25,6 +26,9 @@ public class CustomerService {
     }
 
     public Long save(CustomerPostRequestDTO dto) {
+        if (customerRepository.existsByPin(dto.getPin())) {
+            throw new BadRequestException("A customer with this PIN already exists.");
+        }
         Customer entity = modelMapper.map(dto, Customer.class);
         entity.setActive(true);
         return customerRepository.save(entity).getId();
